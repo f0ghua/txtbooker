@@ -3,6 +3,7 @@
 #include <lfc.h>
 #include <netutils.h>
 #include <gc.h>
+
 #include "txtbookerres.h"
 #include "msgprintf.h"
 #include "regex_helper.h"
@@ -21,10 +22,11 @@ typedef struct book_info {
 	page_info_t pi[1024*5];
 } book_info_t;
 
-book_info_t g_bi = {0};
-const char g_index_url[128] = "https://www.dawenxue.net/50365/";
+book_info_t bi;
+book_info_t *g_pbi;
 
-const char g_pattern[] = "^[ \t]*<dd><a href=\"([^\"]*)\">([^<]*)<.*";
+const char g_index_url[128] = "https://www.dawenxue.net/50365/";
+const char g_pattern[] 		= "^[ \t]*<dd><a href=\"([^\"]*)\">([^<]*)<.*";
 
 long Dlg100ParseSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 {
@@ -49,9 +51,10 @@ long Dlg100ParseSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 	dlg->idcontent->SetWindowText(output);
 	return 0;
 }
+
 long Dlg100GrabSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 {
-	int i, r, ln = 0;
+	int i, r;
 	FILE *fp;
 	char line[1024];
 	char ansiOut[1024];
@@ -61,11 +64,11 @@ long Dlg100GrabSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 	r = GetHttpURL(g_index_url, fname);
 	if (r != 0){
 		int e = GetLastError();
-		LOG("error of gethttpurl = %d", e);
+		ERR("error of gethttpurl = %d", e);
 		return -1;
 	}
 #endif
-	g_bi.pages = 0;
+	g_pbi->pages = 0;
 	fp = fopen(fname, "r");
 	while (1) {
 		if (fgets(line, sizeof(line), fp) == NULL)
@@ -76,32 +79,30 @@ long Dlg100GrabSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 
 		r = regex_match_ERE(ansiOut, g_pattern);
 		if (r == 0) {
-			strncpy(g_bi.pi[g_bi.pages].url, REGEX_MATCH(1), sizeof(g_bi.pi[g_bi.pages].url));
-			strncpy(g_bi.pi[g_bi.pages].title, REGEX_MATCH(2), sizeof(g_bi.pi[g_bi.pages].title));
+			strncpy(g_pbi->pi[g_pbi->pages].url, REGEX_MATCH(1), sizeof(g_pbi->pi[g_pbi->pages].url));
+			strncpy(g_pbi->pi[g_pbi->pages].title, REGEX_MATCH(2), sizeof(g_pbi->pi[g_pbi->pages].title));
 
-			g_bi.pages++;
+			g_pbi->pages++;
 		}
-
-		ln++;
-		//LOG("%3d: %s", ln, line);
 	}
 	fclose(fp);
 
-	LOG("lines = %d, pages = %d", ln, g_bi.pages);
+	LOG("pages = %d", g_pbi->pages);
 
-	for (i = 0; i < g_bi.pages; i++) {
-		dlg->idcbpstart->AddString(g_bi.pi[i].title);
-		//dlg->idcbpstart->AddString("hello world");
+	for (i = 0; i < g_pbi->pages; i++) {
+		dlg->idcbpstart->AddString(g_pbi->pi[i].title);
 	}
 
 	return 0;
 }
+
 long Dlg100Init(ST_DIALOGBOX *ctrl,struct _Dlg100 *dlg)
 {
 	int scrWidth, scrHeight;
     RECT rect;
 
-    //SetProcessDpiAwareness();
+	g_pbi = (book_info_t *)GC_malloc(sizeof(*g_pbi));
+
     scrWidth = GetSystemMetrics(SM_CXSCREEN);
     scrHeight = GetSystemMetrics(SM_CYSCREEN);
     GetWindowRect(dlg->hwnd, &rect);
@@ -118,12 +119,15 @@ long Dlg100Init(ST_DIALOGBOX *ctrl,struct _Dlg100 *dlg)
 
 	return 0;
 }
+
 BOOL WINAPI Dlg100Default(HWND hwnd,UINT msg,UINT wParam,DWORD lParam)
 {
 	return 0;
 }
+
 void Dlg100Destroy(HWND hwnd)
 {
 	EndDialog(hwnd,1);
+	GC_free(g_pbi);
 	return;
 }

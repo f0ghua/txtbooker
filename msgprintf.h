@@ -9,5 +9,6 @@ int MessageBoxPrintf(TCHAR *szFormat, ...);
 void MessageDbgViewPrintf(TCHAR *szFormat, ...);
 
 #define LOG MessageDbgViewPrintf
+#define ERR MessageBoxPrintf
 
 #endif
