@@ -12,6 +12,7 @@
 #define	IDLBLREG	110
 #define	IDEDTREG	111
 #define	IDLBLPSTART	112
+#define	IDPROGRESS	113
 /*@ Prototypes @*/
 #ifndef WEDIT_PROTOTYPES
 #define WEDIT_PROTOTYPES
@@ -19,6 +20,7 @@
  * Structure for dialog Dlg100
  */
 struct _Dlg100 {
+	ST_PROGRESS *idprogress;
 	ST_MULEDIT *idcontent;
 	ST_EDIT *idurl;
 	ST_BUTTON *idgrab;

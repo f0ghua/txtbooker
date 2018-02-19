@@ -10,6 +10,7 @@ static ST_DIALOGBOX *Set_Dlg100_Fields(HWND hwnd)
 	struct _Dlg100 *s;
 	ST_DIALOGBOX *std = GetSTControlFromHwnd(hwnd);
 	s = malloc(sizeof(struct _Dlg100));
+	s->idprogress = GetControl(std,113);
 	s->idcontent = GetControl(std,108);
 	s->idurl = GetControl(std,107);
 	s->idgrab = GetControl(std,106);
@@ -67,6 +68,13 @@ BOOL APIENTRY Dlg100(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 		case WM_DESTROY:
 			/* Remove the input arguments property */
 			RemoveProp(hwnd,"InputArgument");
+			break;
+		case WM_NOTIFY:
+			{
+			NMHDR *pnmhdr = (NMHDR *)lParam;
+			switch (pnmhdr->code) {
+				}
+			}
 			break;
 		case WM_NCDESTROY:
 			ST_DestroyDialogBox(hwnd);
