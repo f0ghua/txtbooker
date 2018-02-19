@@ -81,29 +81,26 @@ long Dlg100ParseSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 	return 0;
 }
 
-long Dlg100GrabSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
+static char *get_url_content(char *p_url)
 {
-	int r = 0, n;
-	const char page_fname[] = "./page.html";
-	char *p_url = g_pbi->pi[0].url;
+	int r = 0;
 	char *p_ansiOut;
 	char *p_plain_buf;
 	int plbuf_len = 0;
 	FILE *fp;
     char *p_content = NULL;
     long bufsize = -1;
-	//const char pattern[] = "^[ \t]*<div id=\"content\">([^<]*)</div>.*";
+	const char page_fname[] = "./page.html";
 	const char pattern[] = "^[ \t]*<div id=\"content\">(.*)</div>";
 
-#if 1
-	LOG("get url = %s", p_url);
+	//LOG("get url = %s", p_url);
 	r = GetHttpURL(p_url, page_fname);
 	if (r != 0){
 		int e = GetLastError();
 		ERR("error[%d] of GetHttpURL = %s", e, p_url);
-		return -1;
+		return NULL;
 	}
-#endif
+
 	p_ansiOut = GC_malloc(1024*10); // 10K should be enough
 
 	fp = fopen(page_fname, "rb");
@@ -114,10 +111,10 @@ long Dlg100GrabSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
             bufsize = ftell(fp);
             if (bufsize == -1) { /* Error */
                 fclose(fp);
-                return -1;
+                return NULL;
             }
 
-			LOG("read bufsize = %d", bufsize);
+			//LOG("read bufsize = %d", bufsize);
         }
         fclose(fp);
     }
@@ -136,21 +133,43 @@ long Dlg100GrabSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 		r = regex_match_ERE(line, pattern);
 		if (r == 0) {
 			char *p = REGEX_MATCH(1);
-			LOG("found match: %s", line);
+			//LOG("found match: %s", line);
 			qstrreplace("sr", p, "&nbsp;", " ");
-			qstrreplace("sr", p, "<br /><br />", "\n");
+			qstrreplace("sr", p, "<br /><br />", "\r\n");
 			p_content = p;
 			break;
 		}
-
-   		line  = strtok(NULL, "\n");
+   		line = strtok(NULL, "\n");
 	}
 	free(dup);
 
-	dlg->idcontent->SetWindowText(p_content);
-
     GC_free(p_plain_buf);
 	GC_free(p_ansiOut);
+	return p_content;
+
+}
+
+long Dlg100GrabSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
+{
+	const char outfname[] = "./out.txt";
+	FILE *fp;
+	char *p_content;
+	int idx_start = dlg->idcbpstart->GetCurSel();
+	int idx_end = dlg->idcbpend->GetCurSel();
+
+	LOG("idx_start = %d, idx_end = %d", idx_start, idx_end);
+
+	fp = fopen(outfname, "w");
+	for (int i = idx_start; i <= idx_end; i++) {
+		p_content = get_url_content(g_pbi->pi[i].url);
+		dlg->idcontent->SetWindowText(p_content);
+		fwrite(g_pbi->pi[i].title, 1, strlen(g_pbi->pi[i].title), fp);
+		fwrite("\r\n", 1, strlen("\r\n"), fp);
+		fwrite(p_content, 1, strlen(p_content), fp);
+		fwrite("\r\n", 1, strlen("\r\n"), fp);
+	}
+	fclose(fp);
+
 	return 0;
 }
 

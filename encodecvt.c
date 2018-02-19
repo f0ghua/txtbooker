@@ -110,11 +110,17 @@ int uncompressGzip(unsigned char *pSrc, int srcSize, char **pOutDest, int *pOutB
     return 0;
 }
 
+static char *memcat(char *dest, size_t dest_len, const char *src, size_t src_len)
+{
+	memcpy(dest+dest_len, src, src_len);
+	return dest;
+}
+
 // use for zlib 1.1.4
 int read_gzip_file(const char *fname, char *p_plain_buf, int buflen)
 {
-	char buf[1024];
-	int err;
+	char buf[1024*10];
+	int err, total_len = 0;
 
 	gzFile in = gzopen(fname, "rb");
     for (;;) {
@@ -126,7 +132,8 @@ int read_gzip_file(const char *fname, char *p_plain_buf, int buflen)
 		}
         if (len == 0) break;
 
-		strcat(p_plain_buf, buf);
+		memcat(p_plain_buf, total_len, buf, len);
+		total_len += len;
     }
 
 	return 0;
