@@ -10,6 +10,7 @@ static ST_DIALOGBOX *Set_Dlg100_Fields(HWND hwnd)
 	struct _Dlg100 *s;
 	ST_DIALOGBOX *std = GetSTControlFromHwnd(hwnd);
 	s = malloc(sizeof(struct _Dlg100));
+	s->idpagenum = GetControl(std,114);
 	s->idprogress = GetControl(std,113);
 	s->idcontent = GetControl(std,108);
 	s->idurl = GetControl(std,107);

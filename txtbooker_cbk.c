@@ -3,6 +3,7 @@
 #include <lfc.h>
 #include <netutils.h>
 #include <gc.h>
+#include <process.h>
 
 #include "txtbookerres.h"
 #include "msgprintf.h"
@@ -22,7 +23,14 @@ typedef struct book_info {
 	page_info_t pi[1024*5]; // how many pages in a book?
 } book_info_t;
 
-book_info_t bi;
+typedef struct th_info {
+	book_info_t bi;
+	int start;
+	int end;
+	HWND hwnd_pgbar;
+	HWND hwnd_pagenum;
+} th_info_t;
+
 book_info_t *g_pbi;
 
 const char g_index_url[128] = "https://www.dawenxue.net/50365/";
@@ -149,8 +157,50 @@ static char *get_url_content(char *p_url)
 
 }
 
+void thread_get_pages(void *arg)
+{
+	th_info_t *pth = (th_info_t *)arg;
+	book_info_t *pbi = &pth->bi;
+	const char outfname[] = "./out.txt";
+	FILE *fp;
+	char *p_content;
+
+	int idx_start = pth->start;
+	int idx_end = pth->end;
+
+	//LOG("idx_start = %d, idx_end = %d", idx_start, idx_end);
+
+	//dlg->idprogress->SetRange(0, idx_end-idx_start+1);
+	//dlg->idprogress->SetStep(1);
+
+	fp = fopen(outfname, "w");
+	for (int i = idx_start; i <= idx_end; i++) {
+		p_content = get_url_content(pbi->pi[i].url);
+		if (p_content == NULL) {
+			return;
+		}
+		// display content seems not good for presentation
+		//dlg->idcontent->SetWindowText(p_content);
+		fwrite(pbi->pi[i].title, 1, strlen(pbi->pi[i].title), fp);
+		fwrite("\r\n", 1, strlen("\r\n"), fp);
+		fwrite(p_content, 1, strlen(p_content), fp);
+		fwrite("\r\n", 1, strlen("\r\n"), fp);
+
+		SendMessage(pth->hwnd_pgbar, PBM_SETPOS, (WPARAM)(i-idx_start+1), (LPARAM)0 );
+		char nstr[16];
+		sprintf(nstr, "%d", (i-idx_start+1));
+		SendMessage(pth->hwnd_pagenum, WM_SETTEXT, (WPARAM)(strlen(nstr)), (LPARAM)(nstr) );
+		//dlg->idprogress->SetPos(i-idx_start+1);
+		Sleep(500);
+	}
+	fclose(fp);
+
+	return;
+}
+
 long Dlg100GrabSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 {
+#if 0
 	const char outfname[] = "./out.txt";
 	FILE *fp;
 	char *p_content;
@@ -179,6 +229,21 @@ long Dlg100GrabSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 		Sleep(500);
 	}
 	fclose(fp);
+#endif
+
+	th_info_t *p_thi;
+
+	p_thi = GC_malloc(sizeof(*p_thi));
+	memcpy(&p_thi->bi, g_pbi, sizeof(*g_pbi));
+	p_thi->hwnd_pgbar = dlg->idprogress->WindowsParams->hwnd;
+	p_thi->hwnd_pagenum = dlg->idpagenum->WindowsParams->hwnd;
+	p_thi->start = dlg->idcbpstart->GetCurSel();
+	p_thi->end = dlg->idcbpend->GetCurSel();
+
+	dlg->idprogress->SetRange(0, p_thi->end-p_thi->start+1);
+	dlg->idprogress->SetStep(1);
+
+	beginthread(thread_get_pages, 0, p_thi);
 
 	return 0;
 }
