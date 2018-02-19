@@ -39,17 +39,18 @@ long Dlg100ParseSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 	char ansiOut[1024];
 
 	dlg->idurl->GetWindowText(url, sizeof(url));
-	strncpy(url, g_index_url, sizeof(url));
+	//strncpy(url, g_index_url, sizeof(url));
 
-#if 1
 	r = GetHttpURL(url, g_index_fname);
 	if (r != 0){
 		int e = GetLastError();
 		ERR("error of gethttpurl = %d", e);
 		return -1;
 	}
-#endif
 
+	memset(g_pbi, 0, sizeof(*g_pbi));
+	dlg->idcbpstart->ResetContent();
+	dlg->idcbpend->ResetContent();
 	g_pbi->pages = 0;
 	fp = fopen(g_index_fname, "r");
 	while (1) {
@@ -179,6 +180,7 @@ long Dlg100Init(ST_DIALOGBOX *ctrl,struct _Dlg100 *dlg)
     RECT rect;
 
 	g_pbi = (book_info_t *)GC_malloc(sizeof(*g_pbi));
+	dlg->idurl->SetWindowText(g_index_url);
 
     scrWidth = GetSystemMetrics(SM_CXSCREEN);
     scrHeight = GetSystemMetrics(SM_CYSCREEN);
