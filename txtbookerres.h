@@ -24,8 +24,6 @@ struct _Dlg100 {
 	ST_BUTTON *idgrab;
 	ST_BUTTON *idparse;
 	ST_STATIC *ctrl101;
-	ST_EDIT *idedtreg;
-	ST_STATIC *idlblreg;
 	ST_COMBOBOX *idcbpend;
 	ST_STATIC *idlblpstart;
 	ST_COMBOBOX *idcbpstart;

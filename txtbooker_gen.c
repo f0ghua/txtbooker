@@ -15,8 +15,6 @@ static ST_DIALOGBOX *Set_Dlg100_Fields(HWND hwnd)
 	s->idgrab = GetControl(std,106);
 	s->idparse = GetControl(std,104);
 	s->ctrl101 = GetControl(std,101);
-	s->idedtreg = GetControl(std,111);
-	s->idlblreg = GetControl(std,110);
 	s->idcbpend = GetControl(std,103);
 	s->idlblpstart = GetControl(std,112);
 	s->idcbpstart = GetControl(std,102);
@@ -63,8 +61,6 @@ BOOL APIENTRY Dlg100(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 				break;
 				case IDPARSE:
 					Dlg100ParseSelected(GetControl(std,104),s);
-				break;
-				case IDEDTREG:
 				break;
 			}
 			break;

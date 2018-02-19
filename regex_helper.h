@@ -3,7 +3,7 @@
 
 #include <regexp.h>
 
-#define REG_MAX_MTLEN (1024*10*10)
+#define REG_MAX_MTLEN (1024*100) // 100K
 #define REGEX_MATCH(i) match_patterns[i]
 
 extern char match_patterns[NSUBEXP][REG_MAX_MTLEN];
