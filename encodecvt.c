@@ -135,7 +135,9 @@ int read_gzip_file(const char *fname, char *p_plain_buf, int buflen)
 		memcat(p_plain_buf, total_len, buf, len);
 		total_len += len;
     }
-
+	if (gzclose(in) != Z_OK) {
+		ERR("gzclose err: %s", gzerror(in, &err));
+	}
 	return 0;
 }
 
