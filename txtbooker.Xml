@@ -15,373 +15,375 @@ Font0="MS Sans Serif"
 />
 <SYMBOLS>
 <SYMBOL
- Type="Container"
- ID_Define="IDD_MAINDIALOG"
- ID-Value="100"
+Type="Container"
+ID_Define="IDD_MAINDIALOG"
+ID-Value="100"
 />
 <SYMBOL
- Type="Element"
- ID_Define="IDCBPSTART"
- ID-Value="102"
+Type="Element"
+ID_Define="IDCBPSTART"
+ID-Value="102"
 />
 <SYMBOL
- Type="Element"
- ID_Define="IDCBPEND"
- ID-Value="103"
+Type="Element"
+ID_Define="IDCBPEND"
+ID-Value="103"
 />
 <SYMBOL
- Type="Element"
- ID_Define="IDPARSE"
- ID-Value="104"
+Type="Element"
+ID_Define="IDPARSE"
+ID-Value="104"
 />
 <SYMBOL
- Type="Element"
- ID_Define="IDGRAP"
- ID-Value="105"
+Type="Element"
+ID_Define="IDGRAP"
+ID-Value="105"
 />
 <SYMBOL
- Type="Element"
- ID_Define="IDGRAB"
- ID-Value="106"
+Type="Element"
+ID_Define="IDGRAB"
+ID-Value="106"
 />
 <SYMBOL
- Type="Element"
- ID_Define="IDURL"
- ID-Value="107"
+Type="Element"
+ID_Define="IDURL"
+ID-Value="107"
 />
 <SYMBOL
- Type="Element"
- ID_Define="IDCONTENT"
- ID-Value="108"
+Type="Element"
+ID_Define="IDCONTENT"
+ID-Value="108"
 />
 <SYMBOL
- Type="Element"
- ID_Define="IDLBLREG"
- ID-Value="110"
+Type="Element"
+ID_Define="IDLBLREG"
+ID-Value="110"
 />
 <SYMBOL
- Type="Element"
- ID_Define="IDEDTREG"
- ID-Value="111"
+Type="Element"
+ID_Define="IDEDTREG"
+ID-Value="111"
 />
 <SYMBOL
- Type="Element"
- ID_Define="IDLBLPSTART"
- ID-Value="112"
+Type="Element"
+ID_Define="IDLBLPSTART"
+ID-Value="112"
 />
 <SYMBOL
- Type="Element"
- ID_Define="IDPROGRESS"
- ID-Value="113"
+Type="Element"
+ID_Define="IDPROGRESS"
+ID-Value="113"
 />
 <SYMBOL
- Type="Element"
- ID_Define="IDPAGENUM"
- ID-Value="114"
+Type="Element"
+ID_Define="IDPAGENUM"
+ID-Value="114"
+/>
+<SYMBOL
+Type="Element"
+ID_Define="IDLSTLOG"
+ID-Value="115"
 />
 </SYMBOLS>
 <DIALOG>
 <DialogHeader
- NumericType="21"
- NumberOfControls="12"
- FontColor="-1"
- BackgroundColor="0"
- Flags="0x4001"
- FunctionPrefix="Dlg100"
- ifdef-symbol=""
- ID_Define="IDD_MAINDIALOG"
- ID-Value="100"
- X-coord="56"
- Y-coord="8"
- Width="379"
- Height="213"
- STYLE="-1865809856"
- EXTENDED-STYLE="0"
- CAPTION="txtbooker"
- Font-Size="8"
- Font-Name="MS Sans Serif"
+NumericType="21"
+NumberOfControls="12"
+FontColor="-1"
+BackgroundColor="0"
+Flags="0x4001"
+FunctionPrefix="Dlg100"
+ifdef-symbol=""
+ID_Define="IDD_MAINDIALOG"
+ID-Value="100"
+X-coord="56"
+Y-coord="8"
+Width="379"
+Height="213"
+STYLE="-1865809856"
+EXTENDED-STYLE="0"
+CAPTION="txtbooker_v0.3"
+Font-Size="8"
+Font-Name="MS Sans Serif"
 />
 <Callbacks
- CallbackCount="9"
+CallbackCount="9"
 >
 <Callback
- Name="HWND StartDlg100(HWND parent);"
- CtrlId="100"
- DialogId="100"
+Name="HWND StartDlg100(HWND parent);"
+CtrlId="100"
+DialogId="100"
 />
 <Callback
- Name="int RunDlg100(HWND parent);"
- CtrlId="100"
- DialogId="100"
+Name="int RunDlg100(HWND parent);"
+CtrlId="100"
+DialogId="100"
 />
 <Callback
- Name="void AddGdiObject(HWND,HANDLE);"
- CtrlId="100"
- DialogId="100"
+Name="void AddGdiObject(HWND,HANDLE);"
+CtrlId="100"
+DialogId="100"
 />
 <Callback
- Name="BOOL WINAPI HandleDefaultMessages(HWND hwnd,UINT msg,WPARAM wParam,DWORD lParam);"
- CtrlId="100"
- DialogId="100"
+Name="BOOL WINAPI HandleDefaultMessages(HWND hwnd,UINT msg,WPARAM wParam,DWORD lParam);"
+CtrlId="100"
+DialogId="100"
 />
 <Callback
- Name="long Dlg100ParseSelected(ST_BUTTON *,struct _Dlg100 *);"
- CtrlId="104"
- DialogId="100"
+Name="long Dlg100ParseSelected(ST_BUTTON *,struct _Dlg100 *);"
+CtrlId="104"
+DialogId="100"
 />
 <Callback
- Name="long Dlg100GrabSelected(ST_BUTTON *,struct _Dlg100 *);"
- CtrlId="106"
- DialogId="100"
+Name="long Dlg100GrabSelected(ST_BUTTON *,struct _Dlg100 *);"
+CtrlId="106"
+DialogId="100"
 />
 <Callback
- Name="long Dlg100Init(ST_DIALOGBOX *,struct _Dlg100 *);"
- CtrlId="100"
- DialogId="100"
+Name="long Dlg100Init(ST_DIALOGBOX *,struct _Dlg100 *);"
+CtrlId="100"
+DialogId="100"
 />
 <Callback
- Name="BOOL APIENTRY Dlg100(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);"
- CtrlId="0"
- DialogId="100"
+Name="BOOL APIENTRY Dlg100(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);"
+CtrlId="0"
+DialogId="100"
 />
 </Callbacks>
 <Controls>
 <CONTROL>
- <FixedPoints> "0" </FixedPoints>
- <FontIndex> "0" </FontIndex>
- <FontSize> "8" </FontSize>
- <Flags> "0x0"</Flags>
- <FunctionPrefix> "Dlg100Text_label109" </FunctionPrefix>
- <TYPE-INDEX> "0" </TYPE-INDEX>
- <TYPE-NAME> "Text label" </TYPE-NAME>
- <CLASS> "STATIC" </CLASS>
- <ID_Define> "IDPAGENUM" </ID_Define>
- <ID-Value> "114" </ID-Value>
- <X-coord> "326" </X-coord>
- <Y-coord> "72" </Y-coord>
- <Width> "27" </Width>
- <Height> "8" </Height>
- <CAPTION> "0" </CAPTION>
- <STYLE> "0x50020002"</STYLE>
- <EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
+<FixedPoints> "0" </FixedPoints>
+<FontIndex> "0" </FontIndex>
+<FontSize> "8" </FontSize>
+<Flags> "0x0"</Flags>
+<FunctionPrefix> "Dlg100List_box109" </FunctionPrefix>
+<LinksTo> "0" </LinksTo>
+<TYPE-INDEX> "7" </TYPE-INDEX>
+<TYPE-NAME> "List box" </TYPE-NAME>
+<CLASS> "LISTBOX" </CLASS>
+<ID_Define> "IDLSTLOG" </ID_Define>
+<ID-Value> "115" </ID-Value>
+<X-coord> "25" </X-coord>
+<Y-coord> "86" </Y-coord>
+<Width> "332" </Width>
+<Height> "92" </Height>
+<STYLE> "0x50A10001"</STYLE>
+<EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
 </CONTROL>
 <CONTROL>
- <FixedPoints> "0" </FixedPoints>
- <FontIndex> "0" </FontIndex>
- <FontSize> "8" </FontSize>
- <Flags> "0x0"</Flags>
- <FunctionPrefix> "Dlg100Progress_control109" </FunctionPrefix>
- <TYPE-INDEX> "17" </TYPE-INDEX>
- <TYPE-NAME> "Progress control" </TYPE-NAME>
- <CLASS> "msctls_progress32" </CLASS>
- <ID_Define> "IDPROGRESS" </ID_Define>
- <ID-Value> "113" </ID-Value>
- <X-coord> "26" </X-coord>
- <Y-coord> "71" </Y-coord>
- <Width> "296" </Width>
- <Height> "11" </Height>
- <STYLE> "0x54000000"</STYLE>
- <EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
+<FixedPoints> "0" </FixedPoints>
+<FontIndex> "0" </FontIndex>
+<FontSize> "8" </FontSize>
+<Flags> "0x0"</Flags>
+<FunctionPrefix> "Dlg100Text_label109" </FunctionPrefix>
+<TYPE-INDEX> "0" </TYPE-INDEX>
+<TYPE-NAME> "Text label" </TYPE-NAME>
+<CLASS> "STATIC" </CLASS>
+<ID_Define> "IDPAGENUM" </ID_Define>
+<ID-Value> "114" </ID-Value>
+<X-coord> "326" </X-coord>
+<Y-coord> "72" </Y-coord>
+<Width> "27" </Width>
+<Height> "8" </Height>
+<CAPTION> "0" </CAPTION>
+<STYLE> "0x50020002"</STYLE>
+<EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
 </CONTROL>
 <CONTROL>
- <FixedPoints> "0" </FixedPoints>
- <FontIndex> "0" </FontIndex>
- <FontSize> "8" </FontSize>
- <Flags> "0x0"</Flags>
- <FunctionPrefix> "Dlg100Edit_field104" </FunctionPrefix>
- <LinksTo> "0" </LinksTo>
- <MaxChars> "0" </MaxChars>
- <AcceptedChars> "" </AcceptedChars>
- <InitialContents> "" </InitialContents>
- <TYPE-INDEX> "1" </TYPE-INDEX>
- <TYPE-NAME> "Edit field" </TYPE-NAME>
- <CLASS> "EDIT" </CLASS>
- <ID_Define> "IDCONTENT" </ID_Define>
- <ID-Value> "108" </ID-Value>
- <X-coord> "25" </X-coord>
- <Y-coord> "87" </Y-coord>
- <Width> "331" </Width>
- <Height> "90" </Height>
- <STYLE> "0x50A11884"</STYLE>
- <EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
+<FixedPoints> "0" </FixedPoints>
+<FontIndex> "0" </FontIndex>
+<FontSize> "8" </FontSize>
+<Flags> "0x0"</Flags>
+<FunctionPrefix> "Dlg100Progress_control109" </FunctionPrefix>
+<TYPE-INDEX> "17" </TYPE-INDEX>
+<TYPE-NAME> "Progress control" </TYPE-NAME>
+<CLASS> "msctls_progress32" </CLASS>
+<ID_Define> "IDPROGRESS" </ID_Define>
+<ID-Value> "113" </ID-Value>
+<X-coord> "26" </X-coord>
+<Y-coord> "71" </Y-coord>
+<Width> "285" </Width>
+<Height> "11" </Height>
+<STYLE> "0x54000000"</STYLE>
+<EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
 </CONTROL>
 <CONTROL>
- <FixedPoints> "0" </FixedPoints>
- <FontIndex> "0" </FontIndex>
- <FontSize> "8" </FontSize>
- <Flags> "0x0"</Flags>
- <FunctionPrefix> "Dlg100Edit_field102" </FunctionPrefix>
- <LinksTo> "0" </LinksTo>
- <MaxChars> "0" </MaxChars>
- <AcceptedChars> "" </AcceptedChars>
- <InitialContents> "" </InitialContents>
- <TYPE-INDEX> "1" </TYPE-INDEX>
- <TYPE-NAME> "Edit field" </TYPE-NAME>
- <CLASS> "EDIT" </CLASS>
- <ID_Define> "IDURL" </ID_Define>
- <ID-Value> "107" </ID-Value>
- <X-coord> "71" </X-coord>
- <Y-coord> "27" </Y-coord>
- <Width> "267" </Width>
- <Height> "12" </Height>
- <STYLE> "0x50810080"</STYLE>
- <EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
+<FixedPoints> "0" </FixedPoints>
+<FontIndex> "0" </FontIndex>
+<FontSize> "8" </FontSize>
+<Flags> "0x0"</Flags>
+<FunctionPrefix> "Dlg100Edit_field102" </FunctionPrefix>
+<LinksTo> "0" </LinksTo>
+<MaxChars> "0" </MaxChars>
+<AcceptedChars> "" </AcceptedChars>
+<InitialContents> "" </InitialContents>
+<TYPE-INDEX> "1" </TYPE-INDEX>
+<TYPE-NAME> "Edit field" </TYPE-NAME>
+<CLASS> "EDIT" </CLASS>
+<ID_Define> "IDURL" </ID_Define>
+<ID-Value> "107" </ID-Value>
+<X-coord> "71" </X-coord>
+<Y-coord> "27" </Y-coord>
+<Width> "267" </Width>
+<Height> "12" </Height>
+<STYLE> "0x50810080"</STYLE>
+<EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
 </CONTROL>
 <CONTROL>
- <FixedPoints> "0" </FixedPoints>
- <FontIndex> "0" </FontIndex>
- <FontSize> "8" </FontSize>
- <Flags> "0x8"</Flags>
- <FunctionPrefix> "Dlg100Grab" </FunctionPrefix>
- <LinksTo> "0" </LinksTo>
- <TYPE-INDEX> "3" </TYPE-INDEX>
- <TYPE-NAME> "Push button" </TYPE-NAME>
- <CLASS> "BUTTON" </CLASS>
- <ID_Define> "IDGRAB" </ID_Define>
- <ID-Value> "106" </ID-Value>
- <X-coord> "312" </X-coord>
- <Y-coord> "183" </Y-coord>
- <Width> "48" </Width>
- <Height> "14" </Height>
- <CAPTION> "抓取文章" </CAPTION>
- <STYLE> "0x50010001"</STYLE>
- <EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
+<FixedPoints> "0" </FixedPoints>
+<FontIndex> "0" </FontIndex>
+<FontSize> "8" </FontSize>
+<Flags> "0x8"</Flags>
+<FunctionPrefix> "Dlg100Grab" </FunctionPrefix>
+<LinksTo> "0" </LinksTo>
+<TYPE-INDEX> "3" </TYPE-INDEX>
+<TYPE-NAME> "Push button" </TYPE-NAME>
+<CLASS> "BUTTON" </CLASS>
+<ID_Define> "IDGRAB" </ID_Define>
+<ID-Value> "106" </ID-Value>
+<X-coord> "312" </X-coord>
+<Y-coord> "183" </Y-coord>
+<Width> "48" </Width>
+<Height> "14" </Height>
+<CAPTION> "抓取文章" </CAPTION>
+<STYLE> "0x50010001"</STYLE>
+<EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
 </CONTROL>
 <CONTROL>
- <FixedPoints> "0" </FixedPoints>
- <FontIndex> "0" </FontIndex>
- <FontSize> "8" </FontSize>
- <Flags> "0x8"</Flags>
- <FunctionPrefix> "Dlg100Parse" </FunctionPrefix>
- <LinksTo> "0" </LinksTo>
- <TYPE-INDEX> "3" </TYPE-INDEX>
- <TYPE-NAME> "Push button" </TYPE-NAME>
- <CLASS> "BUTTON" </CLASS>
- <ID_Define> "IDPARSE" </ID_Define>
- <ID-Value> "104" </ID-Value>
- <X-coord> "254" </X-coord>
- <Y-coord> "183" </Y-coord>
- <Width> "48" </Width>
- <Height> "14" </Height>
- <CAPTION> "解析目录" </CAPTION>
- <STYLE> "0x50010000"</STYLE>
- <EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
+<FixedPoints> "0" </FixedPoints>
+<FontIndex> "0" </FontIndex>
+<FontSize> "8" </FontSize>
+<Flags> "0x8"</Flags>
+<FunctionPrefix> "Dlg100Parse" </FunctionPrefix>
+<LinksTo> "0" </LinksTo>
+<TYPE-INDEX> "3" </TYPE-INDEX>
+<TYPE-NAME> "Push button" </TYPE-NAME>
+<CLASS> "BUTTON" </CLASS>
+<ID_Define> "IDPARSE" </ID_Define>
+<ID-Value> "104" </ID-Value>
+<X-coord> "254" </X-coord>
+<Y-coord> "183" </Y-coord>
+<Width> "48" </Width>
+<Height> "14" </Height>
+<CAPTION> "解析目录" </CAPTION>
+<STYLE> "0x50010000"</STYLE>
+<EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
 </CONTROL>
 <CONTROL>
- <FixedPoints> "0" </FixedPoints>
- <FontIndex> "0" </FontIndex>
- <FontSize> "8" </FontSize>
- <Flags> "0x0"</Flags>
- <FunctionPrefix> "Dlg100Text_label101" </FunctionPrefix>
- <TYPE-INDEX> "0" </TYPE-INDEX>
- <TYPE-NAME> "Text label" </TYPE-NAME>
- <CLASS> "STATIC" </CLASS>
- <ID-Value> "101" </ID-Value>
- <X-coord> "34" </X-coord>
- <Y-coord> "29" </Y-coord>
- <Width> "35" </Width>
- <Height> "10" </Height>
- <CAPTION> "目录链接" </CAPTION>
- <STYLE> "0x50020000"</STYLE>
- <EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
+<FixedPoints> "0" </FixedPoints>
+<FontIndex> "0" </FontIndex>
+<FontSize> "8" </FontSize>
+<Flags> "0x0"</Flags>
+<FunctionPrefix> "Dlg100Text_label101" </FunctionPrefix>
+<TYPE-INDEX> "0" </TYPE-INDEX>
+<TYPE-NAME> "Text label" </TYPE-NAME>
+<CLASS> "STATIC" </CLASS>
+<ID-Value> "101" </ID-Value>
+<X-coord> "34" </X-coord>
+<Y-coord> "29" </Y-coord>
+<Width> "35" </Width>
+<Height> "10" </Height>
+<CAPTION> "目录链接" </CAPTION>
+<STYLE> "0x50020000"</STYLE>
+<EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
 </CONTROL>
 <CONTROL>
- <FixedPoints> "0" </FixedPoints>
- <FontIndex> "0" </FontIndex>
- <FontSize> "8" </FontSize>
- <Flags> "0x0"</Flags>
- <FunctionPrefix> "Dlg100Group_box103" </FunctionPrefix>
- <LinksTo> "0" </LinksTo>
- <TYPE-INDEX> "2" </TYPE-INDEX>
- <TYPE-NAME> "Group box" </TYPE-NAME>
- <CLASS> "BUTTON" </CLASS>
- <ID-Value> "-1" </ID-Value>
- <X-coord> "26" </X-coord>
- <Y-coord> "13" </Y-coord>
- <Width> "329" </Width>
- <Height> "55" </Height>
- <CAPTION> "设置" </CAPTION>
- <STYLE> "0x50000007"</STYLE>
- <EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
+<FixedPoints> "0" </FixedPoints>
+<FontIndex> "0" </FontIndex>
+<FontSize> "8" </FontSize>
+<Flags> "0x0"</Flags>
+<FunctionPrefix> "Dlg100Group_box103" </FunctionPrefix>
+<LinksTo> "0" </LinksTo>
+<TYPE-INDEX> "2" </TYPE-INDEX>
+<TYPE-NAME> "Group box" </TYPE-NAME>
+<CLASS> "BUTTON" </CLASS>
+<ID-Value> "-1" </ID-Value>
+<X-coord> "26" </X-coord>
+<Y-coord> "13" </Y-coord>
+<Width> "329" </Width>
+<Height> "55" </Height>
+<CAPTION> "设置" </CAPTION>
+<STYLE> "0x50000007"</STYLE>
+<EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
 </CONTROL>
 <CONTROL>
- <FixedPoints> "0" </FixedPoints>
- <FontIndex> "0" </FontIndex>
- <FontSize> "8" </FontSize>
- <Flags> "0x0"</Flags>
- <FunctionPrefix> "Dlg100Combo_box102" </FunctionPrefix>
- <MaxChars> "0" </MaxChars>
- <Lines> "0" </Lines>
- <AcceptedChars> "" </AcceptedChars>
- <TYPE-INDEX> "6" </TYPE-INDEX>
- <TYPE-NAME> "Combo box" </TYPE-NAME>
- <CLASS> "COMBOBOX" </CLASS>
- <ID_Define> "IDCBPEND" </ID_Define>
- <ID-Value> "103" </ID-Value>
- <X-coord> "235" </X-coord>
- <Y-coord> "51" </Y-coord>
- <Width> "104" </Width>
- <Height> "69" </Height>
- <STYLE> "0x50210002"</STYLE>
- <EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
+<FixedPoints> "0" </FixedPoints>
+<FontIndex> "0" </FontIndex>
+<FontSize> "8" </FontSize>
+<Flags> "0x0"</Flags>
+<FunctionPrefix> "Dlg100Combo_box102" </FunctionPrefix>
+<MaxChars> "0" </MaxChars>
+<Lines> "0" </Lines>
+<AcceptedChars> "" </AcceptedChars>
+<TYPE-INDEX> "6" </TYPE-INDEX>
+<TYPE-NAME> "Combo box" </TYPE-NAME>
+<CLASS> "COMBOBOX" </CLASS>
+<ID_Define> "IDCBPEND" </ID_Define>
+<ID-Value> "103" </ID-Value>
+<X-coord> "235" </X-coord>
+<Y-coord> "51" </Y-coord>
+<Width> "104" </Width>
+<Height> "69" </Height>
+<STYLE> "0x50210002"</STYLE>
+<EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
 </CONTROL>
 <CONTROL>
- <FixedPoints> "0" </FixedPoints>
- <FontIndex> "0" </FontIndex>
- <FontSize> "8" </FontSize>
- <Flags> "0x0"</Flags>
- <FunctionPrefix> "Dlg100Text_label101" </FunctionPrefix>
- <TYPE-INDEX> "0" </TYPE-INDEX>
- <TYPE-NAME> "Text label" </TYPE-NAME>
- <CLASS> "STATIC" </CLASS>
- <ID_Define> "IDLBLPSTART" </ID_Define>
- <ID-Value> "112" </ID-Value>
- <X-coord> "34" </X-coord>
- <Y-coord> "51" </Y-coord>
- <Width> "35" </Width>
- <Height> "10" </Height>
- <CAPTION> "开始章节" </CAPTION>
- <STYLE> "0x50020000"</STYLE>
- <EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
+<FixedPoints> "0" </FixedPoints>
+<FontIndex> "0" </FontIndex>
+<FontSize> "8" </FontSize>
+<Flags> "0x0"</Flags>
+<FunctionPrefix> "Dlg100Text_label101" </FunctionPrefix>
+<TYPE-INDEX> "0" </TYPE-INDEX>
+<TYPE-NAME> "Text label" </TYPE-NAME>
+<CLASS> "STATIC" </CLASS>
+<ID_Define> "IDLBLPSTART" </ID_Define>
+<ID-Value> "112" </ID-Value>
+<X-coord> "34" </X-coord>
+<Y-coord> "51" </Y-coord>
+<Width> "35" </Width>
+<Height> "10" </Height>
+<CAPTION> "开始章节" </CAPTION>
+<STYLE> "0x50020000"</STYLE>
+<EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
 </CONTROL>
 <CONTROL>
- <FixedPoints> "0" </FixedPoints>
- <FontIndex> "0" </FontIndex>
- <FontSize> "8" </FontSize>
- <Flags> "0x0"</Flags>
- <FunctionPrefix> "Dlg100Text_label101" </FunctionPrefix>
- <TYPE-INDEX> "0" </TYPE-INDEX>
- <TYPE-NAME> "Text label" </TYPE-NAME>
- <CLASS> "STATIC" </CLASS>
- <ID-Value> "-1" </ID-Value>
- <X-coord> "195" </X-coord>
- <Y-coord> "51" </Y-coord>
- <Width> "35" </Width>
- <Height> "10" </Height>
- <CAPTION> "结束章节" </CAPTION>
- <STYLE> "0x50020000"</STYLE>
- <EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
+<FixedPoints> "0" </FixedPoints>
+<FontIndex> "0" </FontIndex>
+<FontSize> "8" </FontSize>
+<Flags> "0x0"</Flags>
+<FunctionPrefix> "Dlg100Text_label101" </FunctionPrefix>
+<TYPE-INDEX> "0" </TYPE-INDEX>
+<TYPE-NAME> "Text label" </TYPE-NAME>
+<CLASS> "STATIC" </CLASS>
+<ID-Value> "-1" </ID-Value>
+<X-coord> "195" </X-coord>
+<Y-coord> "51" </Y-coord>
+<Width> "35" </Width>
+<Height> "10" </Height>
+<CAPTION> "结束章节" </CAPTION>
+<STYLE> "0x50020000"</STYLE>
+<EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
 </CONTROL>
 <CONTROL>
- <FixedPoints> "0" </FixedPoints>
- <FontIndex> "0" </FontIndex>
- <FontSize> "8" </FontSize>
- <Flags> "0x0"</Flags>
- <FunctionPrefix> "Dlg100Combo_box102" </FunctionPrefix>
- <MaxChars> "0" </MaxChars>
- <Lines> "0" </Lines>
- <AcceptedChars> "" </AcceptedChars>
- <TYPE-INDEX> "6" </TYPE-INDEX>
- <TYPE-NAME> "Combo box" </TYPE-NAME>
- <CLASS> "COMBOBOX" </CLASS>
- <ID_Define> "IDCBPSTART" </ID_Define>
- <ID-Value> "102" </ID-Value>
- <X-coord> "74" </X-coord>
- <Y-coord> "51" </Y-coord>
- <Width> "104" </Width>
- <Height> "69" </Height>
- <STYLE> "0x50210002"</STYLE>
- <EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
+<FixedPoints> "0" </FixedPoints>
+<FontIndex> "0" </FontIndex>
+<FontSize> "8" </FontSize>
+<Flags> "0x0"</Flags>
+<FunctionPrefix> "Dlg100Combo_box102" </FunctionPrefix>
+<MaxChars> "0" </MaxChars>
+<Lines> "0" </Lines>
+<AcceptedChars> "" </AcceptedChars>
+<TYPE-INDEX> "6" </TYPE-INDEX>
+<TYPE-NAME> "Combo box" </TYPE-NAME>
+<CLASS> "COMBOBOX" </CLASS>
+<ID_Define> "IDCBPSTART" </ID_Define>
+<ID-Value> "102" </ID-Value>
+<X-coord> "74" </X-coord>
+<Y-coord> "51" </Y-coord>
+<Width> "104" </Width>
+<Height> "69" </Height>
+<STYLE> "0x50210002"</STYLE>
+<EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
 </CONTROL>
 </Controls>
 </DIALOG>

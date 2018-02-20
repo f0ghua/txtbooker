@@ -31,11 +31,12 @@ typedef struct th_info {
 	int end;
 	HWND hwnd_pgbar;
 	HWND hwnd_pagenum;
+	HWND hwnd_log;
 } th_info_t;
 
 book_info_t *g_pbi;
 
-const char g_index_url[128] = "https://www.dawenxue.net/44214/";
+const char g_index_url[128] = "https://www.dawenxue.net/43414/";
 const char g_pattern[] 		= "^[ \t]*<dd><a href=\"([^\"]*)\">([^<]*)<.*";
 const char g_index_fname[] = "./tmp.html";
 const char g_page_fname[] = "./page.html";
@@ -178,6 +179,7 @@ void thread_get_pages(void *arg)
 
 	fp = fopen(outfname, "w");
 	for (int i = idx_start; i <= idx_end; i++) {
+		LOG("get title = %s, url = %s", pbi->pi[i].title, pbi->pi[i].url);
 		p_content = get_url_content(pbi->pi[i].url);
 		if (p_content == NULL) {
 #ifdef F_DEBUG_DLSPEED
@@ -185,6 +187,12 @@ void thread_get_pages(void *arg)
 			char nstr[16];
 			sprintf(nstr, "%d", (i-idx_start+1));
 			SendMessage(pth->hwnd_pagenum, WM_SETTEXT, (WPARAM)(strlen(nstr)), (LPARAM)(nstr) );
+			char logstr[256];
+			sprintf(logstr, "GET PAGE: %s", pbi->pi[i].title);
+			SendMessage(pth->hwnd_log, LB_INSERTSTRING, (WPARAM)(0), (LPARAM)(logstr) );
+			//if (((i-idx_start+1)%200) == 0) {
+			//	Sleep(5000);
+			//}
 			continue;
 #endif
 			fclose(fp);
@@ -199,11 +207,13 @@ void thread_get_pages(void *arg)
 
 		SendMessage(pth->hwnd_pgbar, PBM_SETPOS, (WPARAM)(i-idx_start+1), (LPARAM)0 );
 		char nstr[16];
-		sprintf(nstr, "%d", (i-idx_start+1));
+		sprintf(nstr, "%d/%d", (i-idx_start+1), pbi->pages);
 		SendMessage(pth->hwnd_pagenum, WM_SETTEXT, (WPARAM)(strlen(nstr)), (LPARAM)(nstr) );
-		//dlg->idprogress->SetPos(i-idx_start+1);
-		//Sleep(500);
+		char logstr[256];
+		sprintf(logstr, "GET PAGE: %s", pbi->pi[i].title);
+		SendMessage(pth->hwnd_log, LB_INSERTSTRING, (WPARAM)(0), (LPARAM)(logstr));
 	}
+
 	fclose(fp);
 
 	remove(g_page_fname);
@@ -220,11 +230,14 @@ long Dlg100GrabSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 	memcpy(&p_thi->bi, g_pbi, sizeof(*g_pbi));
 	p_thi->hwnd_pgbar = dlg->idprogress->WindowsParams->hwnd;
 	p_thi->hwnd_pagenum = dlg->idpagenum->WindowsParams->hwnd;
+	p_thi->hwnd_log = dlg->idlstlog->WindowsParams->hwnd;
+
 	p_thi->start = dlg->idcbpstart->GetCurSel();
 	p_thi->end = dlg->idcbpend->GetCurSel();
 
 	dlg->idprogress->SetRange(0, p_thi->end-p_thi->start+1);
 	dlg->idprogress->SetStep(1);
+	dlg->idlstlog->ResetContent();
 
 	beginthread(thread_get_pages, 0, p_thi);
 

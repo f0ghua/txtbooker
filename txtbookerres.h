@@ -14,6 +14,7 @@
 #define	IDLBLPSTART	112
 #define	IDPROGRESS	113
 #define	IDPAGENUM	114
+#define	IDLSTLOG	115
 /*@ Prototypes @*/
 #ifndef WEDIT_PROTOTYPES
 #define WEDIT_PROTOTYPES
@@ -21,9 +22,9 @@
  * Structure for dialog Dlg100
  */
 struct _Dlg100 {
+	ST_LISTBOX *idlstlog;
 	ST_STATIC *idpagenum;
 	ST_PROGRESS *idprogress;
-	ST_MULEDIT *idcontent;
 	ST_EDIT *idurl;
 	ST_BUTTON *idgrab;
 	ST_BUTTON *idparse;
