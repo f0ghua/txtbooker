@@ -10,6 +10,8 @@
 #include "regex_helper.h"
 #include "encodecvt.h"
 
+#define F_DEBUG_DLSPEED
+
 #define MAX_STRLEN 256
 
 typedef struct page_info {
@@ -33,7 +35,7 @@ typedef struct th_info {
 
 book_info_t *g_pbi;
 
-const char g_index_url[128] = "https://www.dawenxue.net/50365/";
+const char g_index_url[128] = "https://www.dawenxue.net/44214/";
 const char g_pattern[] 		= "^[ \t]*<dd><a href=\"([^\"]*)\">([^<]*)<.*";
 const char g_index_fname[] = "./tmp.html";
 const char g_page_fname[] = "./page.html";
@@ -110,8 +112,7 @@ static char *get_url_content(char *p_url)
 		return NULL;
 	}
 
-	p_ansiOut = GC_malloc(1024*10); // 10K should be enough
-
+#ifndef F_DEBUG_DLSPEED
 	fp = fopen(g_page_fname, "rb");
     if (fp != NULL) {
         /* Go to the end of the file. */
@@ -154,8 +155,9 @@ static char *get_url_content(char *p_url)
 
     GC_free(p_plain_buf);
 	GC_free(p_ansiOut);
-	return p_content;
+#endif
 
+	return p_content;
 }
 
 void thread_get_pages(void *arg)
@@ -178,6 +180,14 @@ void thread_get_pages(void *arg)
 	for (int i = idx_start; i <= idx_end; i++) {
 		p_content = get_url_content(pbi->pi[i].url);
 		if (p_content == NULL) {
+#ifdef F_DEBUG_DLSPEED
+			SendMessage(pth->hwnd_pgbar, PBM_SETPOS, (WPARAM)(i-idx_start+1), (LPARAM)0 );
+			char nstr[16];
+			sprintf(nstr, "%d", (i-idx_start+1));
+			SendMessage(pth->hwnd_pagenum, WM_SETTEXT, (WPARAM)(strlen(nstr)), (LPARAM)(nstr) );
+			continue;
+#endif
+			fclose(fp);
 			return;
 		}
 		// display content seems not good for presentation
@@ -204,37 +214,6 @@ void thread_get_pages(void *arg)
 
 long Dlg100GrabSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 {
-#if 0
-	const char outfname[] = "./out.txt";
-	FILE *fp;
-	char *p_content;
-	int idx_start = dlg->idcbpstart->GetCurSel();
-	int idx_end = dlg->idcbpend->GetCurSel();
-
-	LOG("idx_start = %d, idx_end = %d", idx_start, idx_end);
-
-	dlg->idprogress->SetRange(0, idx_end-idx_start+1);
-	dlg->idprogress->SetStep(1);
-
-	fp = fopen(outfname, "w");
-	for (int i = idx_start; i <= idx_end; i++) {
-		p_content = get_url_content(g_pbi->pi[i].url);
-		if (p_content == NULL) {
-			return -1;
-		}
-		// display content seems not good for presentation
-		//dlg->idcontent->SetWindowText(p_content);
-		fwrite(g_pbi->pi[i].title, 1, strlen(g_pbi->pi[i].title), fp);
-		fwrite("\r\n", 1, strlen("\r\n"), fp);
-		fwrite(p_content, 1, strlen(p_content), fp);
-		fwrite("\r\n", 1, strlen("\r\n"), fp);
-
-		dlg->idprogress->SetPos(i-idx_start+1);
-		Sleep(500);
-	}
-	fclose(fp);
-#endif
-
 	th_info_t *p_thi;
 
 	p_thi = GC_malloc(sizeof(*p_thi));
