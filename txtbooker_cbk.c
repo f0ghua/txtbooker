@@ -36,6 +36,7 @@ book_info_t *g_pbi;
 const char g_index_url[128] = "https://www.dawenxue.net/50365/";
 const char g_pattern[] 		= "^[ \t]*<dd><a href=\"([^\"]*)\">([^<]*)<.*";
 const char g_index_fname[] = "./tmp.html";
+const char g_page_fname[] = "./page.html";
 
 long Dlg100ParseSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 {
@@ -98,11 +99,11 @@ static char *get_url_content(char *p_url)
 	FILE *fp;
     char *p_content = NULL;
     long bufsize = -1;
-	const char page_fname[] = "./page.html";
+
 	const char pattern[] = "^[ \t]*<div id=\"content\">(.*)</div>";
 
 	//LOG("get url = %s", p_url);
-	r = GetHttpURL(p_url, page_fname);
+	r = GetHttpURL(p_url, g_page_fname);
 	if (r != 0){
 		int e = GetLastError();
 		ERR("error[%d] of GetHttpURL = %s", e, p_url);
@@ -111,7 +112,7 @@ static char *get_url_content(char *p_url)
 
 	p_ansiOut = GC_malloc(1024*10); // 10K should be enough
 
-	fp = fopen(page_fname, "rb");
+	fp = fopen(g_page_fname, "rb");
     if (fp != NULL) {
         /* Go to the end of the file. */
         if (fseek(fp, 0L, SEEK_END) == 0) {
@@ -129,7 +130,7 @@ static char *get_url_content(char *p_url)
 
 	plbuf_len = sizeof(char) * (bufsize + 1) * 4; // gzip can be >2*len, but 4*len should enough
 	p_plain_buf = GC_malloc(plbuf_len);
-	read_gzip_file(page_fname, p_plain_buf, plbuf_len);
+	read_gzip_file(g_page_fname, p_plain_buf, plbuf_len);
 
     p_ansiOut = GC_malloc(plbuf_len);
 	enc_convert(p_plain_buf, p_ansiOut, CP_UTF8, CP_ACP);
@@ -191,9 +192,12 @@ void thread_get_pages(void *arg)
 		sprintf(nstr, "%d", (i-idx_start+1));
 		SendMessage(pth->hwnd_pagenum, WM_SETTEXT, (WPARAM)(strlen(nstr)), (LPARAM)(nstr) );
 		//dlg->idprogress->SetPos(i-idx_start+1);
-		Sleep(500);
+		//Sleep(500);
 	}
 	fclose(fp);
+
+	remove(g_page_fname);
+	remove(g_index_fname);
 
 	return;
 }
