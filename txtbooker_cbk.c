@@ -10,7 +10,7 @@
 #include "regex_helper.h"
 #include "encodecvt.h"
 
-#define F_DEBUG_DLSPEED
+//#define F_DEBUG_DLSPEED
 
 #define MAX_STRLEN 256
 
