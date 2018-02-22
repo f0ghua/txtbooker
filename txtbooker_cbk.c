@@ -252,6 +252,9 @@ long Dlg100Init(ST_DIALOGBOX *ctrl,struct _Dlg100 *dlg)
 	g_pbi = (book_info_t *)GC_malloc(sizeof(*g_pbi));
 	dlg->idurl->SetWindowText(g_index_url);
 
+	HICON hicon = LoadImage(GetModuleHandle(NULL), (LPCSTR)MAKEINTRESOURCE(IDICON200),
+		IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+	SendMessage(dlg->hwnd, WM_SETICON, ICON_BIG, (LPARAM)hicon);
     scrWidth = GetSystemMetrics(SM_CXSCREEN);
     scrHeight = GetSystemMetrics(SM_CYSCREEN);
     GetWindowRect(dlg->hwnd, &rect);

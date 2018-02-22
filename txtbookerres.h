@@ -15,6 +15,7 @@
 #define	IDPROGRESS	113
 #define	IDPAGENUM	114
 #define	IDLSTLOG	115
+#define	IDICON200	200
 /*@ Prototypes @*/
 #ifndef WEDIT_PROTOTYPES
 #define WEDIT_PROTOTYPES
