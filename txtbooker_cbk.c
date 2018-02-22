@@ -207,7 +207,7 @@ void thread_get_pages(void *arg)
 
 		SendMessage(pth->hwnd_pgbar, PBM_SETPOS, (WPARAM)(i-idx_start+1), (LPARAM)0 );
 		char nstr[16];
-		sprintf(nstr, "%d/%d", (i-idx_start+1), pbi->pages);
+		sprintf(nstr, "%d/%d", (i-idx_start+1), idx_end-idx_start+1);
 		SendMessage(pth->hwnd_pagenum, WM_SETTEXT, (WPARAM)(strlen(nstr)), (LPARAM)(nstr) );
 		char logstr[256];
 		sprintf(logstr, "GET PAGE: %s", pbi->pi[i].title);
@@ -252,9 +252,11 @@ long Dlg100Init(ST_DIALOGBOX *ctrl,struct _Dlg100 *dlg)
 	g_pbi = (book_info_t *)GC_malloc(sizeof(*g_pbi));
 	dlg->idurl->SetWindowText(g_index_url);
 
+	// set dialog icon
 	HICON hicon = LoadImage(GetModuleHandle(NULL), (LPCSTR)MAKEINTRESOURCE(IDICON200),
 		IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 	SendMessage(dlg->hwnd, WM_SETICON, ICON_BIG, (LPARAM)hicon);
+
     scrWidth = GetSystemMetrics(SM_CXSCREEN);
     scrHeight = GetSystemMetrics(SM_CYSCREEN);
     GetWindowRect(dlg->hwnd, &rect);
