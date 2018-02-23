@@ -11,6 +11,7 @@
 #include "encodecvt.h"
 #include "ini.h"
 
+#define F_NO_DEBUG
 //#define F_DEBUG_DLSPEED
 
 #define MAX_STRLEN 256
@@ -207,7 +208,6 @@ long Dlg100ParseSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 
 	p_ansiOut = GC_malloc(bufsiz);
 
-	LOG("p1 = %x, %x, %x", *p_content, *(p_content+1), *(p_content+2));
 	if (((unsigned char)(*p_content) == 0xEF) &&
 		((unsigned char)*(p_content+1) == 0xBB) &&
 		((unsigned char)*(p_content+2) == 0xBF)) { // UTF8
