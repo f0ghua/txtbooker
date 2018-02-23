@@ -117,15 +117,21 @@ static char *memcat(char *dest, size_t dest_len, const char *src, size_t src_len
 }
 
 // use for zlib 1.1.4
-int read_gzip_file(const char *fname, char *p_plain_buf, int buflen)
+int read_gzip_file(const char *fname, char *p_plain_buf, int *buflen)
 {
 	char buf[1024*10];
 	int err, total_len = 0;
 
 	gzFile in = gzopen(fname, "rb");
+#ifndef F_NO_DEBUG
+    LOG("gzread opened");
+#endif
     for (;;) {
 		memset(buf, 0, sizeof(buf));
         int len = gzread(in, buf, sizeof(buf));
+#ifndef F_NO_DEBUG
+        LOG("gzread len = %d", len);
+#endif
         if (len < 0) {
 			ERR("gzread err: %s", gzerror(in, &err));
 			return -1;
@@ -137,7 +143,10 @@ int read_gzip_file(const char *fname, char *p_plain_buf, int buflen)
     }
 	if (gzclose(in) != Z_OK) {
 		ERR("gzclose err: %s", gzerror(in, &err));
+        return -1;
 	}
+
+    *buflen = total_len;
 	return 0;
 }
 

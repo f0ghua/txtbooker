@@ -11,7 +11,7 @@
 #include "encodecvt.h"
 #include "ini.h"
 
-#define F_NO_DEBUG
+//#define F_NO_DEBUG
 //#define F_DEBUG_DLSPEED
 
 #define MAX_STRLEN 256
@@ -36,6 +36,7 @@ typedef struct _site_info {
 	char link_str_end[MAX_STRLEN];
 	char link_pattern[MAX_STRLEN];
 	char content_pattern[MAX_STRLEN];
+    int force_utf8;
 } site_info_t;
 
 typedef struct _book_info {
@@ -103,6 +104,7 @@ static int load_config(char *url)
 	const char *p_lstart = ini_get(config, domain, "link_str_start");
 	const char *p_lend = ini_get(config, domain, "link_str_end");
 	const char *p_lpattern = ini_get(config, domain, "link_pattern");
+    const char *p_lforceutf8 = ini_get(config, domain, "force_utf8");
 
 	if ((p_lstart == NULL)||(p_lend == NULL)||(p_lpattern == NULL)||
 		(p_cpattern == NULL)) {
@@ -116,6 +118,12 @@ static int load_config(char *url)
 	strncpy(g_psi->link_pattern, p_lpattern, sizeof(g_psi->link_pattern));
 	strncpy(g_psi->content_pattern, p_cpattern, sizeof(g_psi->content_pattern));
 
+    if (p_lforceutf8 != NULL) {
+        g_psi->force_utf8 = 1;
+    } else {
+        g_psi->force_utf8 = 0;
+    }
+
 	ini_free(config);
 
 	return 0;
@@ -126,7 +134,9 @@ static int load_config(char *url)
 static char *read_file_all(char *fname, int *bufsize)
 {
 	char *p_content;
+    char *p_ansiOut;
 	FILE *fp;
+    size_t len = 0;
 
 	*bufsize = 0;
 
@@ -149,7 +159,7 @@ static char *read_file_all(char *fname, int *bufsize)
 			/* Allocate our buffer to that size. */
             p_content = GC_malloc(sizeof(char) * (*bufsize + 1));
             /* Read the entire file into memory. */
-            size_t len = fread(p_content, sizeof(char), *bufsize, fp);
+            len = fread(p_content, sizeof(char), *bufsize, fp);
 #ifndef F_NO_DEBUG
 			LOG("read len = %d, bufsize = %d", len, *bufsize);
 #endif
@@ -162,6 +172,21 @@ static char *read_file_all(char *fname, int *bufsize)
                 p_content[++len] = '\0'; /* Just to be safe. */
             }
         }
+
+        if (g_psi->force_utf8 || 
+            (((unsigned char)(*p_content) == 0xEF) &&
+             ((unsigned char)*(p_content+1) == 0xBB) &&
+             ((unsigned char)*(p_content+2) == 0xBF))) { // UTF8
+            // convert UTF8 to GB2312(ASCII)
+#ifndef F_NO_DEBUG
+            LOG("file is UTF8, convert to ASCII");
+#endif
+            p_ansiOut = GC_malloc(len);
+            enc_convert(p_content, p_ansiOut, CP_UTF8, CP_ACP);
+            GC_free(p_content);
+            p_content = p_ansiOut;
+        }
+
         fclose(fp);
     }
 
@@ -206,16 +231,7 @@ long Dlg100ParseSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 		return -1;
 	}
 
-	p_ansiOut = GC_malloc(bufsiz);
-
-	if (((unsigned char)(*p_content) == 0xEF) &&
-		((unsigned char)*(p_content+1) == 0xBB) &&
-		((unsigned char)*(p_content+2) == 0xBF)) { // UTF8
-		// convert UTF8 to GB2312(ASCII)
-		enc_convert(p_content, p_ansiOut, CP_UTF8, CP_ACP);
-	} else {
-		memcpy(p_ansiOut, p_content, bufsiz);
-	}
+	p_ansiOut = p_content;
 
 	if ((p_lstart = strstr(p_ansiOut, g_psi->link_str_start)) == NULL) {
 		ERR("link start is not found");
@@ -263,7 +279,6 @@ long Dlg100ParseSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 	}
 
 	free(p_content);
-	free(p_ansiOut);
 
 #ifndef F_NO_DEBUG
 	LOG("pages = %d", g_pbi->pages);
@@ -333,39 +348,54 @@ static char *get_url_content(char *p_url)
 	// gzip can be >2*len, but 4*len should enough
 	plbuf_len = sizeof(char) * (bufsize + 1) * 4;
 	if ((id[0] == 0x1F) && (id[1] == 0x8B)) { // gzip file
+#ifndef F_NO_DEBUG
+		LOG("gzip file detected, uncompress it");
+#endif
 		p_plain_buf = GC_malloc(plbuf_len);
-		read_gzip_file(g_page_fname, p_plain_buf, plbuf_len);
+		read_gzip_file(g_page_fname, p_plain_buf, &plbuf_len);
+#ifndef F_NO_DEBUG
+        LOG("gzip file %d -> %d", bufsize, plbuf_len);
+#endif
+
+        if (
+            ((unsigned char)(*p_plain_buf) == 0xEF) &&
+            ((unsigned char)*(p_plain_buf+1) == 0xBB) &&
+            ((unsigned char)*(p_plain_buf+2) == 0xBF)
+            ) { // UTF8
+            // convert UTF8 to GB2312(ASCII)
+#ifndef F_NO_DEBUG
+            LOG("uncompressed buff is UTF8, convert to ASCII");
+#endif
+            p_ansiOut = GC_malloc(plbuf_len);
+            enc_convert(p_plain_buf, p_ansiOut, CP_UTF8, CP_ACP);
+            GC_free(p_plain_buf);
+            p_plain_buf = p_ansiOut;
+        }
+
 	} else {
 		p_plain_buf = read_file_all(g_page_fname, &bufsize);
 	}
 
-    p_ansiOut = GC_malloc(plbuf_len);
-	//enc_convert(p_plain_buf, p_ansiOut, CP_UTF8, CP_ACP);
-
-	if (((unsigned char)(*p_plain_buf) == 0xEF) &&
-		((unsigned char)*(p_plain_buf+1) == 0xBB) &&
-		((unsigned char)*(p_plain_buf+2) == 0xBF)) { // UTF8
-		// convert UTF8 to GB2312(ASCII)
-		enc_convert(p_plain_buf, p_ansiOut, CP_UTF8, CP_ACP);
-	} else {
-		memcpy(p_ansiOut, p_plain_buf, bufsize);
-	}
+    p_ansiOut = p_plain_buf;
 
 	qstrreplace("tr", p_ansiOut, "\r\n", "");
-	qstrreplace("sr", p_ansiOut, "&nbsp;", " ");
-	qstrreplace("sr", p_ansiOut, "<br /><br />", "@@");
+    qstrreplace("sr", p_ansiOut, "<br />", "@");
+    qstrreplace("sr", p_ansiOut, "<br/>", "@");
+
     r = regex_match_ERE(p_ansiOut, pattern);
     if (r == 0) {
         char *p = REGEX_MATCH(1);
 
-		qstrreplace("sr", p, "@@", "\r\n");
-        //qstrreplace("sr", p, "&nbsp;", " ");
-        //qstrreplace("sr", p, "<br /><br />", "\r\n");
+        qstrreplace("sr", p, "&nbsp;", " ");
+        qstrreplace("sr", p, " ", "");
+        qstrreplace("tr", p, "\r\n\t", "");
+        qstrreplace("sr", p, "@@", "@");
+        qstrreplace("sr", p, "@", "\r\n");
+
         p_content = p;
     }
 
     GC_free(p_plain_buf);
-	GC_free(p_ansiOut);
 #endif
 
 	return p_content;
