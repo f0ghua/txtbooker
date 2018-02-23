@@ -137,6 +137,7 @@ static char *read_file_all(char *fname, int *bufsize)
     char *p_ansiOut;
 	FILE *fp;
     size_t len = 0;
+    int size, plbuf_len;
 
 	*bufsize = 0;
 
@@ -145,8 +146,8 @@ static char *read_file_all(char *fname, int *bufsize)
         /* Go to the end of the file. */
         if (fseek(fp, 0L, SEEK_END) == 0) {
             /* Get the size of the file. */
-            *bufsize = ftell(fp);
-            if (*bufsize == -1) { /* Error */
+            size = ftell(fp);
+            if (size == -1) { /* Error */
                 fclose(fp);
                 return NULL;
             }
@@ -157,20 +158,35 @@ static char *read_file_all(char *fname, int *bufsize)
                 return NULL;
             }
 			/* Allocate our buffer to that size. */
-            p_content = GC_malloc(sizeof(char) * (*bufsize + 1));
+            p_content = GC_malloc(sizeof(char) * (size + 1));
             /* Read the entire file into memory. */
-            len = fread(p_content, sizeof(char), *bufsize, fp);
+            len = fread(p_content, sizeof(char), size, fp);
 #ifndef F_NO_DEBUG
-			LOG("read len = %d, bufsize = %d", len, *bufsize);
+			LOG("read len = %d, size = %d", len, size);
 #endif
             if (len == 0) {
                 ERR("Error reading file", stderr);
                 fclose(fp);
-				free(p_content);
+				GC_free(p_content);
                 return NULL;
             } else {
                 p_content[++len] = '\0'; /* Just to be safe. */
             }
+        }
+
+        // gzip can be >2*len, but 4*len should enough
+        plbuf_len = sizeof(char) * (size + 1) * 4;
+        if (((unsigned char)(*p_content) == 0x1F) &&
+            ((unsigned char)*(p_content+1) == 0x8B)) { // gzip file
+#ifndef F_NO_DEBUG
+            LOG("gzip file detected, uncompress it");
+#endif
+            GC_free(p_content);
+            p_content = GC_malloc(plbuf_len);
+            read_gzip_file(fname, p_content, &plbuf_len);
+#ifndef F_NO_DEBUG
+            LOG("gzip file %d -> %d", size, plbuf_len);
+#endif
         }
 
         if (g_psi->force_utf8 || 
@@ -250,6 +266,9 @@ long Dlg100ParseSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
     }
 
 	p = p_lstart;
+#ifndef F_NO_DEBUG
+    //LOG("p = %s", p);
+#endif
 	while (p < p_lend) {
 		if ((*p == *g_psi->link_pattern) &&
 			((r = regexec(prog, p)) != 0)) { // match
@@ -298,15 +317,11 @@ static char *get_url_content(char *p_url)
 {
 	int r = 0;
 	char *p_ansiOut;
-	char *p_plain_buf;
-	int plbuf_len = 0;
 	FILE *fp;
     char *p_content = NULL;
     long bufsize = -1;
 	const char *pattern = g_psi->content_pattern;
-	unsigned char id[2];
 
-	//LOG("get url = %s", p_url);
 	r = GetHttpURL(p_url, g_page_fname);
 	if (r != 0){
 		int e = GetLastError();
@@ -315,72 +330,13 @@ static char *get_url_content(char *p_url)
 	}
 
 #ifndef F_DEBUG_DLSPEED
-	fp = fopen(g_page_fname, "rb");
-    if (fp != NULL) {
-        /* Go to the end of the file. */
-        if (fseek(fp, 0L, SEEK_END) == 0) {
-            /* Get the size of the file. */
-            bufsize = ftell(fp);
-            if (bufsize == -1) { /* Error */
-                fclose(fp);
-                return NULL;
-            }
-			//LOG("read bufsize = %d", bufsize);
-        }
-        /* Go back to the start of the file. */
-        if (fseek(fp, 0L, SEEK_SET) != 0) {
-            /* Handle error here */
-            fclose(fp);
-            return NULL;
-        }
-		int len = fread(id, 1, sizeof(id), fp);
-#ifndef F_NO_DEBUG
-		LOG("len = %d, id = %02x %02x", len, id[0], id[1]);
-#endif
-		if (len != sizeof(id)) {
-			fclose(fp);
-			return NULL;
-		}
-
-        fclose(fp);
-    }
-
-	// gzip can be >2*len, but 4*len should enough
-	plbuf_len = sizeof(char) * (bufsize + 1) * 4;
-	if ((id[0] == 0x1F) && (id[1] == 0x8B)) { // gzip file
-#ifndef F_NO_DEBUG
-		LOG("gzip file detected, uncompress it");
-#endif
-		p_plain_buf = GC_malloc(plbuf_len);
-		read_gzip_file(g_page_fname, p_plain_buf, &plbuf_len);
-#ifndef F_NO_DEBUG
-        LOG("gzip file %d -> %d", bufsize, plbuf_len);
-#endif
-
-        if (
-            ((unsigned char)(*p_plain_buf) == 0xEF) &&
-            ((unsigned char)*(p_plain_buf+1) == 0xBB) &&
-            ((unsigned char)*(p_plain_buf+2) == 0xBF)
-            ) { // UTF8
-            // convert UTF8 to GB2312(ASCII)
-#ifndef F_NO_DEBUG
-            LOG("uncompressed buff is UTF8, convert to ASCII");
-#endif
-            p_ansiOut = GC_malloc(plbuf_len);
-            enc_convert(p_plain_buf, p_ansiOut, CP_UTF8, CP_ACP);
-            GC_free(p_plain_buf);
-            p_plain_buf = p_ansiOut;
-        }
-
-	} else {
-		p_plain_buf = read_file_all(g_page_fname, &bufsize);
-	}
-
-    p_ansiOut = p_plain_buf;
+    p_ansiOut = read_file_all(g_page_fname, &bufsize);
 
 	qstrreplace("tr", p_ansiOut, "\r\n", "");
     qstrreplace("sr", p_ansiOut, "<br />", "@");
     qstrreplace("sr", p_ansiOut, "<br/>", "@");
+
+    //LOG("p_ansiOut = %s", p_ansiOut);
 
     r = regex_match_ERE(p_ansiOut, pattern);
     if (r == 0) {
@@ -395,7 +351,7 @@ static char *get_url_content(char *p_url)
         p_content = p;
     }
 
-    GC_free(p_plain_buf);
+    GC_free(p_ansiOut);
 #endif
 
 	return p_content;
