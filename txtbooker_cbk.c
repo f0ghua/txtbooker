@@ -9,24 +9,43 @@
 #include "msgprintf.h"
 #include "regex_helper.h"
 #include "encodecvt.h"
+#include "ini.h"
 
 //#define F_DEBUG_DLSPEED
 
 #define MAX_STRLEN 256
 
-typedef struct page_info {
+#define CPYMATCH2STR(i, s, l)                       \
+	do {                                            \
+        int len = prog->endp[i] - prog->startp[i];  \
+        len = (len > l)?l:len;                      \
+        memcpy(s, prog->startp[i], len);            \
+        (s)[len] = '\0';                            \
+    } while (0);
+
+typedef struct _page_info {
 	char title[MAX_STRLEN];
 	char url[MAX_STRLEN];
 } page_info_t;
 
-typedef struct book_info {
+typedef struct _site_info {
+	char domain[MAX_STRLEN];
+	char title_pattern[MAX_STRLEN];
+	char link_str_start[MAX_STRLEN];
+	char link_str_end[MAX_STRLEN];
+	char link_pattern[MAX_STRLEN];
+	char content_pattern[MAX_STRLEN];
+} site_info_t;
+
+typedef struct _book_info {
 	char url[MAX_STRLEN];
 	int pages;
 	page_info_t pi[1024*5]; // how many pages in a book?
 } book_info_t;
 
-typedef struct th_info {
+typedef struct _th_info {
 	book_info_t bi;
+	site_info_t si;
 	int start;
 	int end;
 	HWND hwnd_pgbar;
@@ -35,22 +54,138 @@ typedef struct th_info {
 } th_info_t;
 
 book_info_t *g_pbi;
+site_info_t *g_psi;
 
-const char g_index_url[128] = "https://www.dawenxue.net/43414/";
-const char g_pattern[] 		= "^[ \t]*<dd><a href=\"([^\"]*)\">([^<]*)<.*";
-const char g_index_fname[] = "./tmp.html";
-const char g_page_fname[] = "./page.html";
+const char g_config_fname[] 	= "./config.ini";
+const char g_index_fname[] 		= "./tmp.html";
+const char g_page_fname[] 		= "./page.html";
+
+const char *g_index_url 		= "https://www.dawenxue.net/937/";
+const char *g_pattern 			= "^[ \t]*<dd><a href=\"([^\"]*)\">([^<]*)<.*";
+const char *g_title_pattern 	= "";
+const char *g_link_str_start 	= "<div id=\"list\">";
+const char *g_link_str_end 		= "</div>";
+const char *g_link_pattern 		= "<dd><a href=\"([^\"]*)\">([^<]*)</a></dd>";
+const char *g_content_pattern 	= "";
+
+/*
+chuangshi.qq.com
+
+const char *g_link_str_start 	= "<div class=\"index_area\">";
+const char *g_link_str_end 		= "<div class=\"footer\">";
+const char *g_link_pattern 		= "<li><a href=\"([^\"]*)\"[^>]*><b class=\"title\">([^<]*)</b></a></li>";
+*/
+
+static int load_config(char *url)
+{
+	ini_t *config;
+	char domain[MAX_STRLEN];
+
+	int r = regex_match_ERE(url, "https?://([^/]*).*");
+	if (r != 0) {
+		ERR("URL link is wrong");
+		return -1;
+	}
+
+	strncpy(domain, REGEX_MATCH(1), sizeof(domain));
+#ifndef F_NO_DEBUG
+	LOG("domain = %s", domain);
+#endif
+	config = ini_load(g_config_fname);
+	if (config == NULL) {
+		ERR("load config file error");
+		return -1;
+	}
+
+	const char *p_tpattern = ini_get(config, domain, "title_pattern");
+	const char *p_cpattern = ini_get(config, domain, "content_pattern");
+	const char *p_lstart = ini_get(config, domain, "link_str_start");
+	const char *p_lend = ini_get(config, domain, "link_str_end");
+	const char *p_lpattern = ini_get(config, domain, "link_pattern");
+
+	if ((p_lstart == NULL)||(p_lend == NULL)||(p_lpattern == NULL)||
+		(p_cpattern == NULL)) {
+		ERR("The site has not supported, please contact the author.");
+		return -1;
+	}
+
+	strncpy(g_psi->title_pattern, g_title_pattern, sizeof(g_psi->title_pattern));
+	strncpy(g_psi->link_str_start, p_lstart, sizeof(g_psi->link_str_start));
+	strncpy(g_psi->link_str_end, p_lend, sizeof(g_psi->link_str_end));
+	strncpy(g_psi->link_pattern, p_lpattern, sizeof(g_psi->link_pattern));
+	strncpy(g_psi->content_pattern, p_cpattern, sizeof(g_psi->content_pattern));
+
+	ini_free(config);
+
+	return 0;
+}
+
+// function which call this subroutine should use GC_free to free the buffer
+// later
+static char *read_file_all(char *fname, int *bufsize)
+{
+	char *p_content;
+	FILE *fp;
+
+	*bufsize = 0;
+
+    fp = fopen(fname, "rb");
+    if (fp != NULL) {
+        /* Go to the end of the file. */
+        if (fseek(fp, 0L, SEEK_END) == 0) {
+            /* Get the size of the file. */
+            *bufsize = ftell(fp);
+            if (*bufsize == -1) { /* Error */
+                fclose(fp);
+                return NULL;
+            }
+            /* Go back to the start of the file. */
+            if (fseek(fp, 0L, SEEK_SET) != 0) {
+                /* Handle error here */
+                fclose(fp);
+                return NULL;
+            }
+			/* Allocate our buffer to that size. */
+            p_content = GC_malloc(sizeof(char) * (*bufsize + 1));
+            /* Read the entire file into memory. */
+            size_t len = fread(p_content, sizeof(char), *bufsize, fp);
+#ifndef F_NO_DEBUG
+			LOG("read len = %d, bufsize = %d", len, *bufsize);
+#endif
+            if (len == 0) {
+                ERR("Error reading file", stderr);
+                fclose(fp);
+				free(p_content);
+                return NULL;
+            } else {
+                p_content[++len] = '\0'; /* Just to be safe. */
+            }
+        }
+        fclose(fp);
+    }
+
+	return p_content;
+}
 
 long Dlg100ParseSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 {
 	char url[MAX_STRLEN], pattern[MAX_STRLEN];
 	int i, r;
 	FILE *fp;
-	char line[1024];
-	char ansiOut[1024];
+	char *p, *s, *e;
+	char *p_lstart, *p_lend;
+	//char line[1024];
+	int bufsiz;
+	char *p_content;
+	char *p_ansiOut;
+	regexp *prog;
 
 	dlg->idurl->GetWindowText(url, sizeof(url));
 	//strncpy(url, g_index_url, sizeof(url));
+
+	if (load_config(url) != 0) {
+		return -1;
+	}
 
 	r = GetHttpURL(url, g_index_fname);
 	if (r != 0){
@@ -59,29 +194,80 @@ long Dlg100ParseSelected(ST_BUTTON *ctrl,struct _Dlg100 *dlg)
 		return -1;
 	}
 
-	memset(g_pbi, 0, sizeof(*g_pbi));
 	dlg->idcbpstart->ResetContent();
 	dlg->idcbpend->ResetContent();
+
+	memset(g_pbi, 0, sizeof(*g_pbi));
 	g_pbi->pages = 0;
-	fp = fopen(g_index_fname, "r");
-	while (1) {
-		if (fgets(line, sizeof(line), fp) == NULL)
-			break;
 
-		enc_convert(line, ansiOut, CP_UTF8, CP_ACP);
+	p_content = read_file_all(g_index_fname, &bufsiz);
+	if (p_content == NULL) {
+		return -1;
+	}
 
-		r = regex_match_ERE(ansiOut, g_pattern);
-		if (r == 0) {
-			snprintf(g_pbi->pi[g_pbi->pages].url, sizeof(g_pbi->pi[g_pbi->pages].url), "%s%s", url, REGEX_MATCH(1));
-			//strncpy(g_pbi->pi[g_pbi->pages].url, REGEX_MATCH(1), sizeof(g_pbi->pi[g_pbi->pages].url));
-			strncpy(g_pbi->pi[g_pbi->pages].title, REGEX_MATCH(2), sizeof(g_pbi->pi[g_pbi->pages].title));
+	p_ansiOut = GC_malloc(bufsiz);
 
+	LOG("p1 = %x, %x, %x", *p_content, *(p_content+1), *(p_content+2));
+	if (((unsigned char)(*p_content) == 0xEF) &&
+		((unsigned char)*(p_content+1) == 0xBB) &&
+		((unsigned char)*(p_content+2) == 0xBF)) { // UTF8
+		// convert UTF8 to GB2312(ASCII)
+		enc_convert(p_content, p_ansiOut, CP_UTF8, CP_ACP);
+	} else {
+		memcpy(p_ansiOut, p_content, bufsiz);
+	}
+
+	if ((p_lstart = strstr(p_ansiOut, g_psi->link_str_start)) == NULL) {
+		ERR("link start is not found");
+		return -1;
+	}
+
+	if ((p_lend = strstr(p_lstart, g_psi->link_str_end)) == NULL) {
+		ERR("link start is not found");
+		return -1;
+	}
+
+	snprintf(pattern, sizeof(pattern), "^%s", g_psi->link_pattern);
+	if ((prog = regcomp(pattern)) == NULL) {
+		ERR("regcomp error");
+        return -1;
+    }
+
+	p = p_lstart;
+	while (p < p_lend) {
+		if ((*p == *g_psi->link_pattern) &&
+			((r = regexec(prog, p)) != 0)) { // match
+			char stmp[MAX_STRLEN];
+
+			CPYMATCH2STR(1, stmp, MAX_STRLEN);
+            snprintf(g_pbi->pi[g_pbi->pages].url,
+                     sizeof(g_pbi->pi[g_pbi->pages].url), "%s%s",
+                     url, stmp);
+
+			CPYMATCH2STR(2, stmp, MAX_STRLEN);
+			strncpy(g_pbi->pi[g_pbi->pages].title,
+                    stmp, sizeof(g_pbi->pi[g_pbi->pages].title));
 			g_pbi->pages++;
+
+			p += prog->endp[0] - prog->startp[0];
+
+			CPYMATCH2STR(0, stmp, MAX_STRLEN);
+#ifndef F_NO_DEBUG
+			//LOG("prog0 = %s", stmp);
+			//LOG("match p = %x, %x, %x, title = %s", p, prog->startp[0], prog->endp[0], stmp);
+#endif
+    	} else {
+			p++;
+			//LOG("no match p = %x", p);
 		}
 	}
-	fclose(fp);
 
+	free(p_content);
+	free(p_ansiOut);
+
+#ifndef F_NO_DEBUG
 	LOG("pages = %d", g_pbi->pages);
+#endif
 
 	for (i = 0; i < g_pbi->pages; i++) {
 		dlg->idcbpstart->AddString(g_pbi->pi[i].title);
@@ -102,8 +288,8 @@ static char *get_url_content(char *p_url)
 	FILE *fp;
     char *p_content = NULL;
     long bufsize = -1;
-
-	const char pattern[] = "^[ \t]*<div id=\"content\">(.*)</div>";
+	const char *pattern = g_psi->content_pattern;
+	unsigned char id[2];
 
 	//LOG("get url = %s", p_url);
 	r = GetHttpURL(p_url, g_page_fname);
@@ -124,35 +310,59 @@ static char *get_url_content(char *p_url)
                 fclose(fp);
                 return NULL;
             }
-
 			//LOG("read bufsize = %d", bufsize);
         }
+        /* Go back to the start of the file. */
+        if (fseek(fp, 0L, SEEK_SET) != 0) {
+            /* Handle error here */
+            fclose(fp);
+            return NULL;
+        }
+		int len = fread(id, 1, sizeof(id), fp);
+#ifndef F_NO_DEBUG
+		LOG("len = %d, id = %02x %02x", len, id[0], id[1]);
+#endif
+		if (len != sizeof(id)) {
+			fclose(fp);
+			return NULL;
+		}
+
         fclose(fp);
     }
 
-	plbuf_len = sizeof(char) * (bufsize + 1) * 4; // gzip can be >2*len, but 4*len should enough
-	p_plain_buf = GC_malloc(plbuf_len);
-	read_gzip_file(g_page_fname, p_plain_buf, plbuf_len);
+	// gzip can be >2*len, but 4*len should enough
+	plbuf_len = sizeof(char) * (bufsize + 1) * 4;
+	if ((id[0] == 0x1F) && (id[1] == 0x8B)) { // gzip file
+		p_plain_buf = GC_malloc(plbuf_len);
+		read_gzip_file(g_page_fname, p_plain_buf, plbuf_len);
+	} else {
+		p_plain_buf = read_file_all(g_page_fname, &bufsize);
+	}
 
     p_ansiOut = GC_malloc(plbuf_len);
-	enc_convert(p_plain_buf, p_ansiOut, CP_UTF8, CP_ACP);
+	//enc_convert(p_plain_buf, p_ansiOut, CP_UTF8, CP_ACP);
 
-	char *dup = strdup(p_ansiOut);
-	char *line = strtok(dup, "\n");
-	while(line) {
-
-		r = regex_match_ERE(line, pattern);
-		if (r == 0) {
-			char *p = REGEX_MATCH(1);
-			//LOG("found match: %s", line);
-			qstrreplace("sr", p, "&nbsp;", " ");
-			qstrreplace("sr", p, "<br /><br />", "\r\n");
-			p_content = p;
-			break;
-		}
-   		line = strtok(NULL, "\n");
+	if (((unsigned char)(*p_plain_buf) == 0xEF) &&
+		((unsigned char)*(p_plain_buf+1) == 0xBB) &&
+		((unsigned char)*(p_plain_buf+2) == 0xBF)) { // UTF8
+		// convert UTF8 to GB2312(ASCII)
+		enc_convert(p_plain_buf, p_ansiOut, CP_UTF8, CP_ACP);
+	} else {
+		memcpy(p_ansiOut, p_plain_buf, bufsize);
 	}
-	free(dup);
+
+	qstrreplace("tr", p_ansiOut, "\r\n", "");
+	qstrreplace("sr", p_ansiOut, "&nbsp;", " ");
+	qstrreplace("sr", p_ansiOut, "<br /><br />", "@@");
+    r = regex_match_ERE(p_ansiOut, pattern);
+    if (r == 0) {
+        char *p = REGEX_MATCH(1);
+
+		qstrreplace("sr", p, "@@", "\r\n");
+        //qstrreplace("sr", p, "&nbsp;", " ");
+        //qstrreplace("sr", p, "<br /><br />", "\r\n");
+        p_content = p;
+    }
 
     GC_free(p_plain_buf);
 	GC_free(p_ansiOut);
@@ -179,7 +389,9 @@ void thread_get_pages(void *arg)
 
 	fp = fopen(outfname, "w");
 	for (int i = idx_start; i <= idx_end; i++) {
+#ifndef F_NO_DEBUG
 		LOG("get title = %s, url = %s", pbi->pi[i].title, pbi->pi[i].url);
+#endif
 		p_content = get_url_content(pbi->pi[i].url);
 		if (p_content == NULL) {
 #ifdef F_DEBUG_DLSPEED
@@ -249,7 +461,10 @@ long Dlg100Init(ST_DIALOGBOX *ctrl,struct _Dlg100 *dlg)
 	int scrWidth, scrHeight;
     RECT rect;
 
+	// init the global structure
 	g_pbi = (book_info_t *)GC_malloc(sizeof(*g_pbi));
+	g_psi = (site_info_t *)GC_malloc(sizeof(*g_psi));
+
 	dlg->idurl->SetWindowText(g_index_url);
 
 	// set dialog icon

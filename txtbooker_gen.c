@@ -29,7 +29,7 @@ BOOL APIENTRY Dlg100(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
 	ST_DIALOGBOX *std;
 	struct _Dlg100 *s;
-
+	
 	std = GetSTControlFromHwnd(hwnd);
 	if (std && std->Data)
 	{
