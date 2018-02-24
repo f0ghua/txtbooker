@@ -349,3 +349,22 @@ char *qstrreplace(const char *mode, char *srcstr, const char *tokstr,
     return retp;
 }
 
+// change full width to half width (gbk need)
+void sbc_to_dbc(char *sbc, char *dbc)
+{
+    for(; *sbc; ++sbc) {
+        if((*sbc & 0xff) == 0xA1 && (*(sbc + 1) & 0xff) == 0xA1) {
+            *dbc++ = 0x20;
+            ++sbc;
+        } else if((*sbc & 0xff) == 0xA3 && 
+                  (*(sbc + 1) & 0xff) >= 0xA1 && 
+                  (*(sbc + 1) & 0xff) <= 0xFE) {
+            *dbc++ = *++sbc - 0x80;
+		} else {
+            if(*sbc < 0)
+                *dbc++ = *sbc++;
+            *dbc++ = *sbc;
+        }
+    }
+    *dbc = 0;
+}

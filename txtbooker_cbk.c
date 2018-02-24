@@ -189,7 +189,7 @@ static char *read_file_all(char *fname, int *bufsize)
 #endif
         }
 
-        if (g_psi->force_utf8 || 
+        if (g_psi->force_utf8 ||
             (((unsigned char)(*p_content) == 0xEF) &&
              ((unsigned char)*(p_content+1) == 0xBB) &&
              ((unsigned char)*(p_content+2) == 0xBF))) { // UTF8
@@ -341,7 +341,10 @@ static char *get_url_content(char *p_url)
     r = regex_match_ERE(p_ansiOut, pattern);
     if (r == 0) {
         char *p = REGEX_MATCH(1);
-
+		
+		char *p_dbc = GC_malloc(strlen(p)+1);
+		sbc_to_dbc(p, p_dbc);
+		p = p_dbc;
         qstrreplace("sr", p, "&nbsp;", " ");
         qstrreplace("sr", p, " ", "");
         qstrreplace("tr", p, "\r\n\t", "");

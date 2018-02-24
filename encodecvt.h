@@ -4,5 +4,6 @@
 void enc_convert(const char *strIn, char *strOut, int sourceCodepage, int targetCodepage);
 int read_gzip_file(const char *fname, char *p_plain_buf, int *buflen);
 char *qstrreplace(const char *mode, char *srcstr, const char *tokstr, const char *word);
+void sbc_to_dbc(char *sbc, char *dbc);
 
 #endif
