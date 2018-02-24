@@ -197,8 +197,7 @@ static char *read_file_all(char *fname, int *bufsize)
 #ifndef F_NO_DEBUG
             LOG("file is UTF8, convert to ASCII");
 #endif
-            p_ansiOut = GC_malloc(len);
-            enc_convert(p_content, p_ansiOut, CP_UTF8, CP_ACP);
+            p_ansiOut = utf8_to_ansi(p_content);
             GC_free(p_content);
             p_content = p_ansiOut;
         }
@@ -339,6 +338,9 @@ static char *get_url_content(char *p_url)
     //LOG("p_ansiOut = %s", p_ansiOut);
 
     r = regex_match_ERE(p_ansiOut, pattern);
+#ifndef F_NO_DEBUG
+	LOG("content match = %d", r);
+#endif    
     if (r == 0) {
         char *p = REGEX_MATCH(1);
 		
@@ -417,6 +419,7 @@ void thread_get_pages(void *arg)
 
 	fclose(fp);
 
+    GC_free(p_content);
 	remove(g_page_fname);
 	remove(g_index_fname);
 
@@ -487,5 +490,6 @@ void Dlg100Destroy(HWND hwnd)
 {
 	EndDialog(hwnd,1);
 	GC_free(g_pbi);
+	GC_free(g_psi);
 	return;
 }

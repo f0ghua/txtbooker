@@ -33,6 +33,26 @@ void enc_convert(const char *strIn, char *strOut, int sourceCodepage, int target
     GC_free(pTargetData);
 }
 
+char *utf8_to_ansi(const char *in)
+{
+    int unicode_len = MultiByteToWideChar(CP_UTF8, 0, in, -1, NULL, 0);
+    
+    wchar_t *p_unicode = NULL;
+    p_unicode = GC_malloc(sizeof(wchar_t)*(unicode_len + 1));
+    MultiByteToWideChar(CP_UTF8, 0, in, -1, (LPWSTR)p_unicode, unicode_len);
+
+    BYTE *out = NULL;
+    int outlen = WideCharToMultiByte(CP_ACP, 0,
+		(LPWSTR)p_unicode, -1, (char *)out, 0, NULL, NULL);
+
+    out = GC_malloc(outlen+1);
+    WideCharToMultiByte(CP_ACP, 0, (LPWSTR)p_unicode,
+		-1, (char *)out, outlen, NULL, NULL);
+    out[outlen] = '\0';
+    
+    return (char *)out;
+}
+
 // use for zlib 1.2.X
 int uncompressGzip(unsigned char *pSrc, int srcSize, char **pOutDest, int *pOutBufSize)
 {

@@ -107,7 +107,7 @@ Font0="MS Sans Serif"
   Height="213"
   STYLE="-1865809856"
   EXTENDED-STYLE="0"
-  CAPTION="txtbooker_v0.4"
+  CAPTION="txtbooker_v0.5"
   Font-Size="8"
   Font-Name="MS Sans Serif"
  />
@@ -115,32 +115,7 @@ Font0="MS Sans Serif"
   CallbackCount="8"
  >
  <Callback
-  Name="BOOL APIENTRY Dlg100(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);"
-  CtrlId="0"
-  DialogId="100"
- />
- <Callback
-  Name="long Dlg100Init(ST_DIALOGBOX *,struct _Dlg100 *);"
-  CtrlId="100"
-  DialogId="100"
- />
- <Callback
-  Name="long Dlg100GrabSelected(ST_BUTTON *,struct _Dlg100 *);"
-  CtrlId="106"
-  DialogId="100"
- />
- <Callback
-  Name="long Dlg100ParseSelected(ST_BUTTON *,struct _Dlg100 *);"
-  CtrlId="104"
-  DialogId="100"
- />
- <Callback
-  Name="BOOL WINAPI HandleDefaultMessages(HWND hwnd,UINT msg,WPARAM wParam,DWORD lParam);"
-  CtrlId="100"
-  DialogId="100"
- />
- <Callback
-  Name="void AddGdiObject(HWND,HANDLE);"
+  Name="HWND StartDlg100(HWND parent);"
   CtrlId="100"
   DialogId="100"
  />
@@ -150,8 +125,33 @@ Font0="MS Sans Serif"
   DialogId="100"
  />
  <Callback
-  Name="HWND StartDlg100(HWND parent);"
+  Name="void AddGdiObject(HWND,HANDLE);"
   CtrlId="100"
+  DialogId="100"
+ />
+ <Callback
+  Name="BOOL WINAPI HandleDefaultMessages(HWND hwnd,UINT msg,WPARAM wParam,DWORD lParam);"
+  CtrlId="100"
+  DialogId="100"
+ />
+ <Callback
+  Name="long Dlg100ParseSelected(ST_BUTTON *,struct _Dlg100 *);"
+  CtrlId="104"
+  DialogId="100"
+ />
+ <Callback
+  Name="long Dlg100GrabSelected(ST_BUTTON *,struct _Dlg100 *);"
+  CtrlId="106"
+  DialogId="100"
+ />
+ <Callback
+  Name="long Dlg100Init(ST_DIALOGBOX *,struct _Dlg100 *);"
+  CtrlId="100"
+  DialogId="100"
+ />
+ <Callback
+  Name="BOOL APIENTRY Dlg100(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);"
+  CtrlId="0"
   DialogId="100"
  />
 </Callbacks>
@@ -227,7 +227,7 @@ Font0="MS Sans Serif"
   <CLASS> "EDIT" </CLASS>
   <ID_Define> "IDURL" </ID_Define>
   <ID-Value> "107" </ID-Value>
-  <X-coord> "71" </X-coord>
+  <X-coord> "74" </X-coord>
   <Y-coord> "27" </Y-coord>
   <Width> "267" </Width>
   <Height> "12" </Height>
@@ -395,6 +395,6 @@ Font0="MS Sans Serif"
 <ICON
 ID_Define="IDICON200"
 ID-Value="200"
-Filename="e:\\gitsource\\txtbooker\\texbooker.ico"
+Filename="txtbooker.ico"
 />
 </resource>
