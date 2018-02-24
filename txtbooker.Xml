@@ -115,12 +115,27 @@ Font0="MS Sans Serif"
   CallbackCount="8"
  >
  <Callback
-  Name="HWND StartDlg100(HWND parent);"
+  Name="BOOL APIENTRY Dlg100(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);"
+  CtrlId="0"
+  DialogId="100"
+ />
+ <Callback
+  Name="long Dlg100Init(ST_DIALOGBOX *,struct _Dlg100 *);"
   CtrlId="100"
   DialogId="100"
  />
  <Callback
-  Name="int RunDlg100(HWND parent);"
+  Name="long Dlg100GrabSelected(ST_BUTTON *,struct _Dlg100 *);"
+  CtrlId="106"
+  DialogId="100"
+ />
+ <Callback
+  Name="long Dlg100ParseSelected(ST_BUTTON *,struct _Dlg100 *);"
+  CtrlId="104"
+  DialogId="100"
+ />
+ <Callback
+  Name="BOOL WINAPI HandleDefaultMessages(HWND hwnd,UINT msg,WPARAM wParam,DWORD lParam);"
   CtrlId="100"
   DialogId="100"
  />
@@ -130,28 +145,13 @@ Font0="MS Sans Serif"
   DialogId="100"
  />
  <Callback
-  Name="BOOL WINAPI HandleDefaultMessages(HWND hwnd,UINT msg,WPARAM wParam,DWORD lParam);"
+  Name="int RunDlg100(HWND parent);"
   CtrlId="100"
   DialogId="100"
  />
  <Callback
-  Name="long Dlg100ParseSelected(ST_BUTTON *,struct _Dlg100 *);"
-  CtrlId="104"
-  DialogId="100"
- />
- <Callback
-  Name="long Dlg100GrabSelected(ST_BUTTON *,struct _Dlg100 *);"
-  CtrlId="106"
-  DialogId="100"
- />
- <Callback
-  Name="long Dlg100Init(ST_DIALOGBOX *,struct _Dlg100 *);"
+  Name="HWND StartDlg100(HWND parent);"
   CtrlId="100"
-  DialogId="100"
- />
- <Callback
-  Name="BOOL APIENTRY Dlg100(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);"
-  CtrlId="0"
   DialogId="100"
  />
 </Callbacks>
@@ -186,9 +186,9 @@ Font0="MS Sans Serif"
   <CLASS> "STATIC" </CLASS>
   <ID_Define> "IDPAGENUM" </ID_Define>
   <ID-Value> "114" </ID-Value>
-  <X-coord> "326" </X-coord>
+  <X-coord> "309" </X-coord>
   <Y-coord> "72" </Y-coord>
-  <Width> "27" </Width>
+  <Width> "44" </Width>
   <Height> "8" </Height>
   <CAPTION> "0" </CAPTION>
   <STYLE> "0x50020002"</STYLE>
@@ -207,7 +207,7 @@ Font0="MS Sans Serif"
   <ID-Value> "113" </ID-Value>
   <X-coord> "26" </X-coord>
   <Y-coord> "71" </Y-coord>
-  <Width> "285" </Width>
+  <Width> "281" </Width>
   <Height> "11" </Height>
   <STYLE> "0x54000000"</STYLE>
   <EXTENDED-STYLE> "0x0"</EXTENDED-STYLE>
