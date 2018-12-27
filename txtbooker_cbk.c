@@ -334,16 +334,17 @@ static char *get_url_content(char *p_url)
 	qstrreplace("tr", p_ansiOut, "\r\n", "");
     qstrreplace("sr", p_ansiOut, "<br />", "@");
     qstrreplace("sr", p_ansiOut, "<br/>", "@");
+	qstrreplace("sr", p_ansiOut, "</br>", "@");
 
     //LOG("p_ansiOut = %s", p_ansiOut);
 
     r = regex_match_ERE(p_ansiOut, pattern);
 #ifndef F_NO_DEBUG
 	LOG("content match = %d", r);
-#endif    
+#endif
     if (r == 0) {
         char *p = REGEX_MATCH(1);
-		
+
 		char *p_dbc = GC_malloc(strlen(p)+1);
 		sbc_to_dbc(p, p_dbc);
 		p = p_dbc;
